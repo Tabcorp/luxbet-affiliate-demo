@@ -114,14 +114,15 @@ $(function() {
 	}
 
 	function loadAffiliate() {
-		var aff_n = $.cookie('aff_n');
-		var aff_b = $.cookie('aff_b');
-		var aff_c = $.cookie('aff_c');
+		var aff_raw = $.cookie("boincacc");
 
-		if (aff_n && aff_b && aff_c) {
-			n = aff_n;
-			b = aff_b;
-			c = aff_c;
+		if(aff_raw) {
+			var aff_split = aff_raw.split(":");
+
+			// parameters in sequence are n, c, b
+			n = aff_split[0];
+			c = aff_split[1];
+			b = aff_split[2];
 			return true;
 		} else {
 			return false;
@@ -129,9 +130,8 @@ $(function() {
 	}
 
 	function saveAffiliate() {
-		$.cookie('aff_n', n, { expires: 30 });
-		$.cookie('aff_b', b, { expires: 30 });
-		$.cookie('aff_c', c, { expires: 30 });
+		// parameters in sequence are n, c, b
+		$.cookie("boincacc", n + ":" + c + ":" + b, { expires: 30, path : "/", domain : "." + window.location.hostname });
 
 		if (loadAffiliate()) {
 			return true;
