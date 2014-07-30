@@ -104,10 +104,16 @@ $(function() {
 		}
 
 		if (oGetVars.n && oGetVars.b && oGetVars.c ) {
-			n = oGetVars.n;
-			b = oGetVars.b;
-			c = oGetVars.c;
-			return true;
+			// check sanity
+			if ($.isNumeric(oGetVars.n) && $.isNumeric(oGetVars.b) && $.isNumeric(oGetVars.c)) {
+				n = oGetVars.n;
+				b = oGetVars.b;
+				c = oGetVars.c;
+				return true;
+			} else {
+				// invalid entry
+				return false;
+			}
 		} else {
 			return false;
 		}
@@ -116,27 +122,60 @@ $(function() {
 	function loadAffiliate() {
 		var aff_raw = $.cookie("boincacc");
 
-		if(aff_raw) {
+		if (aff_raw) {
 			var aff_split = aff_raw.split(":");
 
-			// parameters in sequence are n, c, b
-			n = aff_split[0];
-			c = aff_split[1];
-			b = aff_split[2];
-			return true;
+			// check sanity
+			if (aff_split.length == 3 && $.isNumeric(aff_split[0]) && $.isNumeric(aff_split[1]) && $.isNumeric(aff_split[2])) {
+				n = aff_split[0];
+				c = aff_split[1];
+				b = aff_split[2];
+				return true;
+			} else {
+				// remove invalid cookie
+				$.removeCookie("boincacc");
+				return false;
+			}
 		} else {
 			return false;
 		}
 	}
 
 	function saveAffiliate() {
+		// get root domain
+		var itsRoot = getRootDomain("luxbet");
+
 		// parameters in sequence are n, c, b
-		$.cookie("boincacc", n + ":" + c + ":" + b, { expires: 30, path : "/", domain : "." + window.location.hostname });
+		$.cookie("boincacc", n + ":" + c + ":" + b, { expires: 30, path : "/", domain : itsRoot });
 
 		if (loadAffiliate()) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	function getRootDomain(nameOfDomain) {
+		// get hostname
+		var currentHostName = window.location.hostname;
+		var rootDomain = "";
+
+		if (currentHostName) {
+			var splitHostName = currentHostName.split(".");
+
+			// capture all after nameOfDomain
+			for (var i = 0; i < splitHostName.length; i++) {
+				if (splitHostName[i] == nameOfDomain || rootDomain != "") {
+					rootDomain = rootDomain + "." + splitHostName[i];
+				}
+			}
+		}
+
+		// if invalid -use default
+		if (rootDomain == "") {
+			rootDomain = null;
+		}
+
+		return rootDomain;
 	}
 });
